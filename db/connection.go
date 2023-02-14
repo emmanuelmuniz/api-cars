@@ -3,6 +3,7 @@ package db
 import (
 	"log"
 
+	"github.com/emmanuelmuniz/api-cars/main/cars/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -19,4 +20,6 @@ func DBConnection() {
 	} else {
 		log.Println("DB Connected")
 	}
+
+	DB.AutoMigrate(&models.Car{})
 }
