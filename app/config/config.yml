@@ -1,0 +1,13 @@
+database:
+  user: postgres
+  password: 1234admin
+  net: tcp
+  port: 5432
+  addr: 127.0.0.1
+  dbname: CPM
+  allowNativePasswords: true
+  params:
+    parseTime: "true"
+
+server:
+  address: 8080
