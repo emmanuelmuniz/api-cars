@@ -1,33 +1,31 @@
-package db
+package datastore
 
 import (
+	"api-cars/app/config"
+	"api-cars/app/domain/model"
 	"fmt"
-	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"github.com/emmanuelmuniz/api-cars/main/cars/models"
 )
 
 var DB *gorm.DB
 
-func ConnectDatabase() {
+func NewDB() *gorm.DB {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-		os.Getenv("DB_PORT"),
-	)
+		config.C.Database.Addr,
+		config.C.Database.User,
+		config.C.Database.Password,
+		config.C.Database.DBName,
+		config.C.Database.Port)
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		panic("Failed to connect to database")
 	}
 
-	database.AutoMigrate(&models.Car{})
+	database.AutoMigrate(&model.Car{})
 
-	DB = database
+	return database
 }
