@@ -49,3 +49,8 @@ func (cr *carRepository) Create(c *model.Car) (*model.Car, error) {
 
 	return c, nil
 }
+
+func (cr *carRepository) Delete(id string) {
+	var c *model.Car
+	cr.db.Delete(&c, id)
+}

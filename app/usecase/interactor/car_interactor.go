@@ -17,6 +17,7 @@ type CarInteractor interface {
 	Get(c []*model.Car) ([]*model.Car, error)
 	GetOne(id string) (*model.Car, error)
 	Create(c *model.Car) (*model.Car, error)
+	Delete(id string)
 }
 
 func NewCarInteractor(r repository.CarRepository, p presenter.CarPresenter, d repository.DBRepository) CarInteractor {
@@ -63,4 +64,8 @@ func (c *carInteractor) Create(car *model.Car) (*model.Car, error) {
 	}
 
 	return car, nil
+}
+
+func (ci *carInteractor) Delete(id string) {
+	ci.CarRepository.Delete(id)
 }

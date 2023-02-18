@@ -16,6 +16,7 @@ type CarController interface {
 	GetCars(c Context) error
 	GetCar(c Context, id string) error
 	CreateCar(c Context) error
+	DeleteCar(c Context, id string) error
 }
 
 func NewCarController(car interactor.CarInteractor) CarController {
@@ -56,4 +57,9 @@ func (cc *carController) CreateCar(c Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, car)
+}
+
+func (cc *carController) DeleteCar(c Context, id string) error {
+	cc.carInteractor.Delete(id)
+	return c.JSON(http.StatusNoContent, nil)
 }
