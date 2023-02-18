@@ -3,6 +3,7 @@ package repository
 import (
 	"api-cars/app/domain/model"
 	"api-cars/app/usecase/repository"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -15,20 +16,36 @@ func NewCarRepository(db *gorm.DB) repository.CarRepository {
 	return &carRepository{db}
 }
 
-func (ur *carRepository) FindAll(u []*model.Car) ([]*model.Car, error) {
-	err := ur.db.Find(&u).Error
+func (cr *carRepository) FindAll(c []*model.Car) ([]*model.Car, error) {
+	err := cr.db.Find(&c).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return u, nil
+	return c, nil
 }
 
-func (ur *carRepository) Create(u *model.Car) (*model.Car, error) {
-	if err := ur.db.Create(u).Error; err != nil {
+func (cr *carRepository) FindOne(id string) (*model.Car, error) {
+	var c *model.Car
+
+	err := cr.db.First(&c, id).Error
+
+	if c == nil {
+		return nil, errors.New("Record with id " + id + "not fond")
+	}
+
+	if err != nil {
 		return nil, err
 	}
 
-	return u, nil
+	return c, nil
+}
+
+func (cr *carRepository) Create(c *model.Car) (*model.Car, error) {
+	if err := cr.db.Create(c).Error; err != nil {
+		return nil, err
+	}
+
+	return c, nil
 }

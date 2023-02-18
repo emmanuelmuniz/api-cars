@@ -14,31 +14,43 @@ type carInteractor struct {
 }
 
 type CarInteractor interface {
-	Get(u []*model.Car) ([]*model.Car, error)
-	Create(u *model.Car) (*model.Car, error)
+	Get(c []*model.Car) ([]*model.Car, error)
+	GetOne(id string) (*model.Car, error)
+	Create(c *model.Car) (*model.Car, error)
 }
 
 func NewCarInteractor(r repository.CarRepository, p presenter.CarPresenter, d repository.DBRepository) CarInteractor {
 	return &carInteractor{r, p, d}
 }
 
-func (us *carInteractor) Get(u []*model.Car) ([]*model.Car, error) {
-	u, err := us.CarRepository.FindAll(u)
+func (ci *carInteractor) Get(car []*model.Car) ([]*model.Car, error) {
+	car, err := ci.CarRepository.FindAll(car)
 	if err != nil {
 		return nil, err
 	}
 
-	return us.CarPresenter.ResponseCars(u), nil
+	return ci.CarPresenter.ResponseCars(car), nil
+}
+
+func (ci *carInteractor) GetOne(id string) (*model.Car, error) {
+	car, err := ci.CarRepository.FindOne(id)
+
+	if car == nil {
+		return nil, errors.New("Record with id " + id + "not fond")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ci.CarPresenter.ResponseCar(car), nil
 }
 
 func (c *carInteractor) Create(car *model.Car) (*model.Car, error) {
 	data, err := c.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
-		u, err := c.CarRepository.Create(car)
+		car, err := c.CarRepository.Create(car)
 
-		// do mailing
-		// do logging
-		// do another process
-		return u, err
+		return car, err
 	})
 	car, ok := data.(*model.Car)
 

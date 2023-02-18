@@ -4,6 +4,8 @@ import (
 	"api-cars/app/domain/model"
 	"api-cars/app/usecase/interactor"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 type carController struct {
@@ -12,6 +14,7 @@ type carController struct {
 
 type CarController interface {
 	GetCars(c Context) error
+	GetCar(c Context, id string) error
 	CreateCar(c Context) error
 }
 
@@ -20,14 +23,24 @@ func NewCarController(car interactor.CarInteractor) CarController {
 }
 
 func (cc *carController) GetCars(c Context) error {
-	var u []*model.Car
+	var car []*model.Car
 
-	u, err := cc.carInteractor.Get(u)
+	car, err := cc.carInteractor.Get(car)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, u)
+	return c.JSON(http.StatusOK, car)
+}
+
+func (cc *carController) GetCar(c Context, id string) error {
+	car, err := cc.carInteractor.GetOne(id)
+
+	if err != nil {
+		return echo.NewHTTPError(404)
+	}
+
+	return c.JSON(http.StatusCreated, car)
 }
 
 func (cc *carController) CreateCar(c Context) error {
@@ -37,10 +50,10 @@ func (cc *carController) CreateCar(c Context) error {
 		return err
 	}
 
-	u, err := cc.carInteractor.Create(&params)
+	car, err := cc.carInteractor.Create(&params)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, u)
+	return c.JSON(http.StatusCreated, car)
 }
