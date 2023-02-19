@@ -2,13 +2,10 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Car struct {
-	gorm.Model
-
+	Id          int64      `json:"id"`
 	Description string     `json:"description"`
 	Make        string     `json:"make"`
 	Price       float32    `json:"price"`
@@ -20,7 +17,6 @@ type Car struct {
 	Distance    int        `json:"distance"`
 	CreatedAt   *time.Time `json:"created_at"`
 	UpdatedAt   *time.Time `json:"updated_at"`
-	DeletedAt   *time.Time `json:"deleted_at"`
 }
 
 func (Car) TableName() string { return "cars" }
