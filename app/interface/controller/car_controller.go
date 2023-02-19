@@ -61,7 +61,12 @@ func (cc *carController) CreateCar(c Context) error {
 }
 
 func (cc *carController) DeleteCar(c Context, id string) error {
-	cc.carInteractor.Delete(id)
+	err := cc.carInteractor.Delete(id)
+
+	if err != nil {
+		return echo.NewHTTPError(404)
+	}
+
 	return c.JSON(http.StatusNoContent, nil)
 }
 
@@ -74,7 +79,7 @@ func (cc *carController) UpdateCar(c Context) error {
 
 	car, err := cc.carInteractor.Update(&params)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(404)
 	}
 
 	return c.JSON(http.StatusCreated, car)

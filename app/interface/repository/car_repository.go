@@ -50,9 +50,10 @@ func (cr *carRepository) Create(c *model.Car) (*model.Car, error) {
 	return c, nil
 }
 
-func (cr *carRepository) Delete(id string) {
+func (cr *carRepository) Delete(id string) error {
 	var c *model.Car
-	cr.db.Delete(&c, id)
+	err := cr.db.Delete(&c, id).Error
+	return err
 }
 
 func (cr *carRepository) Update(c *model.Car) (*model.Car, error) {
