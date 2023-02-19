@@ -17,6 +17,7 @@ type CarController interface {
 	GetCar(c Context, id string) error
 	CreateCar(c Context) error
 	DeleteCar(c Context, id string) error
+	UpdateCar(c Context) error
 }
 
 func NewCarController(car interactor.CarInteractor) CarController {
@@ -62,4 +63,19 @@ func (cc *carController) CreateCar(c Context) error {
 func (cc *carController) DeleteCar(c Context, id string) error {
 	cc.carInteractor.Delete(id)
 	return c.JSON(http.StatusNoContent, nil)
+}
+
+func (cc *carController) UpdateCar(c Context) error {
+	var params model.Car
+
+	if err := c.Bind(&params); err != nil {
+		return err
+	}
+
+	car, err := cc.carInteractor.Update(&params)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusCreated, car)
 }

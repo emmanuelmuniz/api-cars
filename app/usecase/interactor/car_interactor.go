@@ -18,6 +18,7 @@ type CarInteractor interface {
 	GetOne(id string) (*model.Car, error)
 	Create(c *model.Car) (*model.Car, error)
 	Delete(id string)
+	Update(c *model.Car) (*model.Car, error)
 }
 
 func NewCarInteractor(r repository.CarRepository, p presenter.CarPresenter, d repository.DBRepository) CarInteractor {
@@ -56,7 +57,7 @@ func (c *carInteractor) Create(car *model.Car) (*model.Car, error) {
 	car, ok := data.(*model.Car)
 
 	if !ok {
-		return nil, errors.New("cast error")
+		return nil, errors.New("Creation error")
 	}
 
 	if err != nil {
@@ -68,4 +69,23 @@ func (c *carInteractor) Create(car *model.Car) (*model.Car, error) {
 
 func (ci *carInteractor) Delete(id string) {
 	ci.CarRepository.Delete(id)
+}
+
+func (c *carInteractor) Update(car *model.Car) (*model.Car, error) {
+	data, err := c.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
+		car, err := c.CarRepository.Update(car)
+
+		return car, err
+	})
+	car, ok := data.(*model.Car)
+
+	if !ok {
+		return nil, errors.New("Update error")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return car, nil
 }

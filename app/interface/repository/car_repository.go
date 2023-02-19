@@ -54,3 +54,11 @@ func (cr *carRepository) Delete(id string) {
 	var c *model.Car
 	cr.db.Delete(&c, id)
 }
+
+func (cr *carRepository) Update(c *model.Car) (*model.Car, error) {
+	if err := cr.db.Save(c).Error; err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
