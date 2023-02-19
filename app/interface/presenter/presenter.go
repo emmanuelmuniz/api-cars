@@ -11,9 +11,10 @@ func NewCarPresenter() presenter.CarPresenter {
 	return &carPresenter{}
 }
 
-func (up *carPresenter) ResponseCars(us []*model.Car) []*model.Car {
-	for _, u := range us {
-		u.Make = "Car Make: " + u.Make
-	}
-	return us
+func (cp *carPresenter) ResponseCars(cars []*model.Car) []*model.Car {
+	return cars
+}
+
+func (cp *carPresenter) ResponseCar(car *model.Car) *model.Car {
+	return car
 }
