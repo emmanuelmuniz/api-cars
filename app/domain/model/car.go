@@ -6,12 +6,14 @@ import (
 
 type Car struct {
 	Id          int64      `json:"id"`
+	MakeID      int64      `json:"-"`
+	Make        Make       `json:"make" gorm:"foreignKey:MakeID;references:id"`
+	CarModelID  int64      `json:"-"`
+	CarModel    CarModel   `json:"car_models" gorm:"foreignKey:CarModelID;references:id"`
 	Description string     `json:"description"`
-	Make        string     `json:"make"`
 	Price       float32    `json:"price"`
 	Year        int        `json:"year"`
 	New         bool       `json:"new"`
-	CarModel    string     `json:"car_model"`
 	BodyStyle   string     `json:"body_style"`
 	Doors       int        `json:"doors"`
 	Distance    int        `json:"distance"`

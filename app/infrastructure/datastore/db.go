@@ -26,6 +26,8 @@ func NewDB() *gorm.DB {
 	}
 
 	database.AutoMigrate(&model.Car{})
+	database.AutoMigrate(&model.Make{})
+	database.AutoMigrate(&model.CarModel{})
 
 	return database
 }

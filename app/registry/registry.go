@@ -20,6 +20,8 @@ func NewRegistry(db *gorm.DB) Registry {
 
 func (r *registry) NewAppController() controller.AppController {
 	return controller.AppController{
-		Car: r.NewCarController(),
+		Car:      r.NewCarController(),
+		Make:     r.NewMakeController(),
+		CarModel: r.NewCarModelController(),
 	}
 }
