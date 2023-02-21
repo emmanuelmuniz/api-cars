@@ -87,7 +87,7 @@ func (mi *makeInteractor) Delete(id string) error {
 }
 
 func (mi *makeInteractor) Update(make *model.Make) (*model.Make, error) {
-	errExists := mi.ValidateRecordExists(string(make.Id))
+	errExists := mi.ValidateRecordExists(strconv.Itoa((make.Id)))
 
 	if errExists != nil {
 		return nil, errExists
