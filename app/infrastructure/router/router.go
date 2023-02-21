@@ -28,5 +28,11 @@ func NewRouter(e *echo.Echo, c controller.AppController) *echo.Echo {
 	e.POST("/car-models", func(context echo.Context) error { return c.CarModel.CreateCarModel(context) })
 	e.DELETE("/car-models/:id", func(context echo.Context) error { return c.CarModel.DeleteCarModel(context, context.Param("id")) })
 	e.PUT("/car-models", func(context echo.Context) error { return c.CarModel.UpdateCarModel(context) })
+
+	e.GET("/body-styles", func(context echo.Context) error { return c.BodyStyle.GetBodyStyles(context) })
+	e.GET("/body-styles/:id", func(context echo.Context) error { return c.BodyStyle.GetBodyStyle(context, context.Param("id")) })
+	e.POST("/body-styles", func(context echo.Context) error { return c.BodyStyle.CreateBodyStyle(context) })
+	e.DELETE("/body-styles/:id", func(context echo.Context) error { return c.BodyStyle.DeleteBodyStyle(context, context.Param("id")) })
+	e.PUT("/body-styles", func(context echo.Context) error { return c.BodyStyle.UpdateBodyStyle(context) })
 	return e
 }

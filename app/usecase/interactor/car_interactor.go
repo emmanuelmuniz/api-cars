@@ -9,11 +9,12 @@ import (
 )
 
 type carInteractor struct {
-	CarRepository      repository.CarRepository
-	CarPresenter       presenter.CarPresenter
-	MakeRepository     repository.MakeRepository
-	CarModelRepository repository.CarModelRepository
-	DBRepository       repository.DBRepository
+	CarRepository       repository.CarRepository
+	CarPresenter        presenter.CarPresenter
+	MakeRepository      repository.MakeRepository
+	CarModelRepository  repository.CarModelRepository
+	BodyStyleRepository repository.BodyStyleRepository
+	DBRepository        repository.DBRepository
 }
 
 type CarInteractor interface {
@@ -28,8 +29,9 @@ func NewCarInteractor(r repository.CarRepository,
 	p presenter.CarPresenter,
 	mr repository.MakeRepository,
 	cmr repository.CarModelRepository,
+	bdr repository.BodyStyleRepository,
 	d repository.DBRepository) CarInteractor {
-	return &carInteractor{r, p, mr, cmr, d}
+	return &carInteractor{r, p, mr, cmr, bdr, d}
 }
 
 func (ci *carInteractor) Get(car []*model.Car) ([]*model.Car, error) {
@@ -71,6 +73,16 @@ func (c *carInteractor) Create(car *model.Car) (*model.Car, error) {
 	car.Make = carModel.Make
 	var newCarmodel = carModel
 	car.CarModel = *newCarmodel
+
+	var bodyStyle *model.BodyStyle
+
+	bodyStyle, err = repository.BodyStyleRepository.FindOne(c.BodyStyleRepository, car.BodyStyle.Id)
+
+	if err != nil {
+		return nil, model.HandleError(err, "Body Style with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
+	}
+
+	car.BodyStyle = *bodyStyle
 
 	data, err := c.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
 		car, err := c.CarRepository.Create(car)
@@ -119,9 +131,19 @@ func (ci *carInteractor) Update(car *model.Car) (*model.Car, error) {
 		return nil, model.HandleError(errExists, "Car Model with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
+	var bodyStyle *model.BodyStyle
+
+	bodyStyle, err = repository.BodyStyleRepository.FindOne(ci.BodyStyleRepository, car.BodyStyle.Id)
+
+	if err != nil {
+		return nil, model.HandleError(errExists, "Body Style with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
+	}
+
 	car.Make = carModel.Make
 	var newCarmodel = carModel
 	car.CarModel = *newCarmodel
+
+	car.BodyStyle = *bodyStyle
 
 	data, err := ci.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
 		car, err := ci.CarRepository.Update(car)

@@ -14,7 +14,8 @@ type Car struct {
 	Price       float32    `json:"price"`
 	Year        int        `json:"year"`
 	New         bool       `json:"new"`
-	BodyStyle   string     `json:"body_style"`
+	BodyStyleID int        `json:"-"`
+	BodyStyle   BodyStyle  `json:"body_style"`
 	Doors       int        `json:"doors"`
 	Distance    int        `json:"distance"`
 	CreatedAt   *time.Time `json:"-"`
