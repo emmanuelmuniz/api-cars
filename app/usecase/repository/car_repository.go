@@ -6,8 +6,8 @@ import (
 
 type CarRepository interface {
 	FindAll(c []*model.Car) ([]*model.Car, error)
-	FindOne(id string) (*model.Car, error)
+	FindOne(id int) (*model.Car, error)
 	Create(c *model.Car) (*model.Car, error)
-	Delete(id string) error
+	Delete(id int) error
 	Update(c *model.Car) (*model.Car, error)
 }

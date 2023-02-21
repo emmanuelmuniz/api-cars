@@ -1,5 +1,7 @@
 package controller
 
 type AppController struct {
-	Car interface{ CarController }
+	Car      interface{ CarController }
+	Make     interface{ MakeController }
+	CarModel interface{ CarModelController }
 }
