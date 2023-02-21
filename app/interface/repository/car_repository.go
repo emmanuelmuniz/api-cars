@@ -3,7 +3,6 @@ package repository
 import (
 	"api-cars/app/domain/model"
 	"api-cars/app/usecase/repository"
-	"errors"
 
 	"gorm.io/gorm"
 )
@@ -29,10 +28,6 @@ func (cr *carRepository) FindAll(c []*model.Car) ([]*model.Car, error) {
 func (cr *carRepository) FindOne(id int) (*model.Car, error) {
 	var c *model.Car
 	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").First(&c, id).Error
-
-	if c == nil {
-		return nil, errors.New("Record with id " + string(id) + "not fond")
-	}
 
 	if err != nil {
 		return nil, err
