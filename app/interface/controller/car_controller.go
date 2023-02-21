@@ -4,8 +4,6 @@ import (
 	"api-cars/app/domain/model"
 	"api-cars/app/usecase/interactor"
 	"net/http"
-
-	"github.com/labstack/echo/v4"
 )
 
 type carController struct {
@@ -28,8 +26,9 @@ func (cc *carController) GetCars(c Context) error {
 	var car []*model.Car
 
 	car, err := cc.carInteractor.Get(car)
+
 	if err != nil {
-		return err
+		return sendErrorCar(c, err)
 	}
 
 	return c.JSON(http.StatusOK, car)
@@ -39,7 +38,7 @@ func (cc *carController) GetCar(c Context, id string) error {
 	car, err := cc.carInteractor.GetOne(id)
 
 	if err != nil {
-		return echo.NewHTTPError(404)
+		return sendErrorCar(c, err)
 	}
 
 	return c.JSON(http.StatusCreated, car)
@@ -49,12 +48,12 @@ func (cc *carController) CreateCar(c Context) error {
 	var params model.Car
 
 	if err := c.Bind(&params); err != nil {
-		return err
+		return sendErrorCar(c, model.NewAppError("Bad Request. "+err.Error(), http.StatusBadRequest))
 	}
 
 	car, err := cc.carInteractor.Create(&params)
 	if err != nil {
-		return err
+		return sendErrorCar(c, err)
 	}
 
 	return c.JSON(http.StatusCreated, car)
@@ -64,7 +63,7 @@ func (cc *carController) DeleteCar(c Context, id string) error {
 	err := cc.carInteractor.Delete(id)
 
 	if err != nil {
-		return echo.NewHTTPError(404)
+		return sendErrorCar(c, err)
 	}
 
 	return c.JSON(http.StatusNoContent, nil)
@@ -74,12 +73,13 @@ func (cc *carController) UpdateCar(c Context) error {
 	var params model.Car
 
 	if err := c.Bind(&params); err != nil {
-		return err
+		return sendErrorCar(c, model.NewAppError("Bad Request. "+err.Error(), http.StatusBadRequest))
 	}
 
 	car, err := cc.carInteractor.Update(&params)
+
 	if err != nil {
-		return echo.NewHTTPError(404)
+		return sendErrorCar(c, err)
 	}
 
 	return c.JSON(http.StatusCreated, car)

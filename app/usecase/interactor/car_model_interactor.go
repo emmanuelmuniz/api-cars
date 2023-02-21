@@ -4,7 +4,7 @@ import (
 	"api-cars/app/domain/model"
 	"api-cars/app/usecase/presenter"
 	"api-cars/app/usecase/repository"
-	"errors"
+	"net/http"
 	"strconv"
 )
 
@@ -32,8 +32,9 @@ func NewCarModelInteractor(r repository.CarModelRepository,
 
 func (cmi *carModelInteractor) Get(carModel []*model.CarModel) ([]*model.CarModel, error) {
 	carModel, err := cmi.CarModelRepository.FindAll(carModel)
+
 	if err != nil {
-		return nil, err
+		return nil, model.HandleError(err, "Error to retrieve records. "+err.Error(), http.StatusNotFound)
 	}
 
 	return cmi.CarModelPresenter.ResponseCarModels(carModel), nil
@@ -41,14 +42,15 @@ func (cmi *carModelInteractor) Get(carModel []*model.CarModel) ([]*model.CarMode
 
 func (cmi *carModelInteractor) GetOne(id string) (*model.CarModel, error) {
 	idn, errValid := strconv.Atoi(id)
+
 	if errValid != nil {
-		return nil, errValid
+		return nil, model.HandleError(errValid, "Bad request. "+errValid.Error(), http.StatusNotFound)
 	}
 
 	carModel, err := cmi.CarModelRepository.FindOne(idn)
 
 	if err != nil {
-		return nil, err
+		return nil, model.HandleError(err, "Car Model with ID "+id+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	return cmi.CarModelPresenter.ResponseCarModel(carModel), nil
@@ -61,7 +63,7 @@ func (m *carModelInteractor) Create(carModel *model.CarModel) (*model.CarModel, 
 	make, err = repository.MakeRepository.FindOne(m.MakeRepository, carModel.Make.Id)
 
 	if err != nil {
-		return nil, err
+		return nil, model.HandleError(err, "Make with ID "+strconv.Itoa(carModel.Make.Id)+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	carModel.Make = *make
@@ -75,26 +77,24 @@ func (m *carModelInteractor) Create(carModel *model.CarModel) (*model.CarModel, 
 	carModel, ok := data.(*model.CarModel)
 
 	if !ok {
-		return nil, err
-	}
-
-	if err != nil {
-		return nil, err
+		return nil, model.HandleError(err, "Failed to create Car Model. "+err.Error(), http.StatusBadRequest)
 	}
 
 	return carModel, nil
 }
 
 func (cmi *carModelInteractor) Delete(id string) error {
-	err := cmi.ValidateRecordExists(id)
 
 	idn, errValid := strconv.Atoi(id)
+
 	if errValid != nil {
-		return errValid
+		return model.HandleError(errValid, "Bad request. "+errValid.Error(), http.StatusNotFound)
 	}
 
+	err := cmi.ValidateRecordExists(id)
+
 	if err != nil {
-		return err
+		return model.HandleError(err, "Car Model with ID "+id+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	return cmi.CarModelRepository.Delete(idn)
@@ -104,7 +104,7 @@ func (cmi *carModelInteractor) Update(carModel *model.CarModel) (*model.CarModel
 	errExists := cmi.ValidateRecordExists(strconv.Itoa(carModel.Id))
 
 	if errExists != nil {
-		return nil, errExists
+		return nil, model.HandleError(errExists, "Car Model with ID "+strconv.Itoa(carModel.Id)+" not found. "+errExists.Error(), http.StatusNotFound)
 	}
 
 	var err error
@@ -113,7 +113,7 @@ func (cmi *carModelInteractor) Update(carModel *model.CarModel) (*model.CarModel
 	make, err = repository.MakeRepository.FindOne(cmi.MakeRepository, carModel.Make.Id)
 
 	if err != nil {
-		return nil, err
+		return nil, model.HandleError(err, "Make with ID "+strconv.Itoa(carModel.Make.Id)+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	carModel.Make = *make
@@ -125,12 +125,8 @@ func (cmi *carModelInteractor) Update(carModel *model.CarModel) (*model.CarModel
 	})
 	carModel, ok := data.(*model.CarModel)
 
-	if !ok {
-		return nil, errors.New("Update error")
-	}
-
-	if err != nil {
-		return nil, err
+	if !ok || err != nil {
+		return nil, model.HandleError(err, "Failed to update Car Model.  "+err.Error(), http.StatusNotFound)
 	}
 
 	return carModel, nil
