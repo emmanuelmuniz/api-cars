@@ -5,6 +5,7 @@ import (
 	"api-cars/app/usecase/presenter"
 	"api-cars/app/usecase/repository"
 	"errors"
+	"strconv"
 )
 
 type makeInteractor struct {
@@ -35,7 +36,13 @@ func (mi *makeInteractor) Get(make []*model.Make) ([]*model.Make, error) {
 }
 
 func (mi *makeInteractor) GetOne(id string) (*model.Make, error) {
-	make, err := mi.MakeRepository.FindOne(id)
+
+	idn, errValid := strconv.Atoi(id)
+	if errValid != nil {
+		return nil, errValid
+	}
+
+	make, err := mi.MakeRepository.FindOne(idn)
 
 	if err != nil {
 		return nil, err
@@ -67,11 +74,16 @@ func (m *makeInteractor) Create(make *model.Make) (*model.Make, error) {
 func (mi *makeInteractor) Delete(id string) error {
 	err := mi.ValidateRecordExists(id)
 
+	idn, errValid := strconv.Atoi(id)
+	if errValid != nil {
+		return errValid
+	}
+
 	if err != nil {
 		return err
 	}
 
-	return mi.MakeRepository.Delete(id)
+	return mi.MakeRepository.Delete(idn)
 }
 
 func (mi *makeInteractor) Update(make *model.Make) (*model.Make, error) {

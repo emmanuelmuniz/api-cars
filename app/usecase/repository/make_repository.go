@@ -6,8 +6,8 @@ import (
 
 type MakeRepository interface {
 	FindAll(m []*model.Make) ([]*model.Make, error)
-	FindOne(id string) (*model.Make, error)
+	FindOne(id int) (*model.Make, error)
 	Create(m *model.Make) (*model.Make, error)
-	Delete(id string) error
+	Delete(id int) error
 	Update(m *model.Make) (*model.Make, error)
 }

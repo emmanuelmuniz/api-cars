@@ -10,6 +10,7 @@ import (
 func (r *registry) NewCarModelController() controller.CarModelController {
 	carModelInteractor := interactor.NewCarModelInteractor(
 		ir.NewCarModelRepository(r.db),
+		ir.NewMakeRepository(r.db),
 		ip.NewCarModelPresenter(),
 		ir.NewDBRepository(r.db),
 	)

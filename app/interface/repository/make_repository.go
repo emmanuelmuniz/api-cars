@@ -26,13 +26,13 @@ func (mr *makeRepository) FindAll(m []*model.Make) ([]*model.Make, error) {
 	return m, nil
 }
 
-func (mr *makeRepository) FindOne(id string) (*model.Make, error) {
+func (mr *makeRepository) FindOne(id int) (*model.Make, error) {
 	var m *model.Make
 
 	err := mr.db.First(&m, id).Error
 
 	if m == nil {
-		return nil, errors.New("Record with id " + id + "not fond")
+		return nil, errors.New("Record with id " + string(id) + "not fond")
 	}
 
 	if err != nil {
@@ -50,7 +50,7 @@ func (mr *makeRepository) Create(m *model.Make) (*model.Make, error) {
 	return m, nil
 }
 
-func (mr *makeRepository) Delete(id string) error {
+func (mr *makeRepository) Delete(id int) error {
 	var m *model.Make
 	err := mr.db.Delete(&m, id).Error
 	return err

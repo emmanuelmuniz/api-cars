@@ -11,6 +11,8 @@ func (r *registry) NewCarController() controller.CarController {
 	carInteractor := interactor.NewCarInteractor(
 		ir.NewCarRepository(r.db),
 		ip.NewCarPresenter(),
+		ir.NewMakeRepository(r.db),
+		ir.NewCarModelRepository(r.db),
 		ir.NewDBRepository(r.db),
 	)
 

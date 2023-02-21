@@ -5,10 +5,12 @@ import (
 	"api-cars/app/usecase/presenter"
 	"api-cars/app/usecase/repository"
 	"errors"
+	"strconv"
 )
 
 type carModelInteractor struct {
 	CarModelRepository repository.CarModelRepository
+	MakeRepository     repository.MakeRepository
 	CarModelPresenter  presenter.CarModelPresenter
 	DBRepository       repository.DBRepository
 }
@@ -21,8 +23,11 @@ type CarModelInteractor interface {
 	Update(m *model.CarModel) (*model.CarModel, error)
 }
 
-func NewCarModelInteractor(r repository.CarModelRepository, p presenter.CarModelPresenter, d repository.DBRepository) CarModelInteractor {
-	return &carModelInteractor{r, p, d}
+func NewCarModelInteractor(r repository.CarModelRepository,
+	mr repository.MakeRepository,
+	p presenter.CarModelPresenter,
+	d repository.DBRepository) CarModelInteractor {
+	return &carModelInteractor{r, mr, p, d}
 }
 
 func (cmi *carModelInteractor) Get(carModel []*model.CarModel) ([]*model.CarModel, error) {
@@ -35,7 +40,12 @@ func (cmi *carModelInteractor) Get(carModel []*model.CarModel) ([]*model.CarMode
 }
 
 func (cmi *carModelInteractor) GetOne(id string) (*model.CarModel, error) {
-	carModel, err := cmi.CarModelRepository.FindOne(id)
+	idn, errValid := strconv.Atoi(id)
+	if errValid != nil {
+		return nil, errValid
+	}
+
+	carModel, err := cmi.CarModelRepository.FindOne(idn)
 
 	if err != nil {
 		return nil, err
@@ -45,6 +55,17 @@ func (cmi *carModelInteractor) GetOne(id string) (*model.CarModel, error) {
 }
 
 func (m *carModelInteractor) Create(carModel *model.CarModel) (*model.CarModel, error) {
+	var err error
+	var make *model.Make
+
+	make, err = repository.MakeRepository.FindOne(m.MakeRepository, carModel.Make.Id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	carModel.Make = *make
+
 	data, err := m.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
 		carModel, err := m.CarModelRepository.Create(carModel)
 
@@ -67,19 +88,35 @@ func (m *carModelInteractor) Create(carModel *model.CarModel) (*model.CarModel, 
 func (cmi *carModelInteractor) Delete(id string) error {
 	err := cmi.ValidateRecordExists(id)
 
+	idn, errValid := strconv.Atoi(id)
+	if errValid != nil {
+		return errValid
+	}
+
 	if err != nil {
 		return err
 	}
 
-	return cmi.CarModelRepository.Delete(id)
+	return cmi.CarModelRepository.Delete(idn)
 }
 
 func (cmi *carModelInteractor) Update(carModel *model.CarModel) (*model.CarModel, error) {
-	errExists := cmi.ValidateRecordExists(string(carModel.Id))
+	errExists := cmi.ValidateRecordExists(strconv.Itoa(carModel.Id))
 
 	if errExists != nil {
 		return nil, errExists
 	}
+
+	var err error
+	var make *model.Make
+
+	make, err = repository.MakeRepository.FindOne(cmi.MakeRepository, carModel.Make.Id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	carModel.Make = *make
 
 	data, err := cmi.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
 		carModel, err := cmi.CarModelRepository.Update(carModel)

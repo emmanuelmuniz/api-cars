@@ -17,7 +17,7 @@ func NewCarModelRepository(db *gorm.DB) repository.CarModelRepository {
 }
 
 func (mr *carModelRepository) FindAll(cm []*model.CarModel) ([]*model.CarModel, error) {
-	err := mr.db.Find(&cm).Error
+	err := mr.db.Preload("Make").Find(&cm).Error
 
 	if err != nil {
 		return nil, err
@@ -26,13 +26,13 @@ func (mr *carModelRepository) FindAll(cm []*model.CarModel) ([]*model.CarModel, 
 	return cm, nil
 }
 
-func (mr *carModelRepository) FindOne(id string) (*model.CarModel, error) {
+func (mr *carModelRepository) FindOne(id int) (*model.CarModel, error) {
 	var cm *model.CarModel
 
-	err := mr.db.First(&cm, id).Error
+	err := mr.db.Preload("Make").First(&cm, id).Error
 
 	if cm == nil {
-		return nil, errors.New("Record with id " + id + "not fond")
+		return nil, errors.New("Record with id " + string(id) + "not fond")
 	}
 
 	if err != nil {
@@ -50,7 +50,7 @@ func (mr *carModelRepository) Create(cm *model.CarModel) (*model.CarModel, error
 	return cm, nil
 }
 
-func (mr *carModelRepository) Delete(id string) error {
+func (mr *carModelRepository) Delete(id int) error {
 	var cm *model.CarModel
 	err := mr.db.Delete(&cm, id).Error
 	return err

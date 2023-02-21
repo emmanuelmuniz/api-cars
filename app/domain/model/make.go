@@ -5,11 +5,11 @@ import (
 )
 
 type Make struct {
-	Id          int64      `json:"id"`
+	Id          int        `json:"id"`
 	Make        string     `json:"make"`
 	Description string     `json:"description"`
-	CreatedAt   *time.Time `json:"created_at"`
-	UpdatedAt   *time.Time `json:"updated_at"`
+	CreatedAt   *time.Time `json:"-"`
+	UpdatedAt   *time.Time `json:"-"`
 }
 
 func (Make) TableName() string { return "makes" }

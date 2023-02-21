@@ -17,7 +17,7 @@ func NewCarRepository(db *gorm.DB) repository.CarRepository {
 }
 
 func (cr *carRepository) FindAll(c []*model.Car) ([]*model.Car, error) {
-	err := cr.db.Find(&c).Error
+	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Find(&c).Error
 
 	if err != nil {
 		return nil, err
@@ -26,13 +26,12 @@ func (cr *carRepository) FindAll(c []*model.Car) ([]*model.Car, error) {
 	return c, nil
 }
 
-func (cr *carRepository) FindOne(id string) (*model.Car, error) {
+func (cr *carRepository) FindOne(id int) (*model.Car, error) {
 	var c *model.Car
-
-	err := cr.db.First(&c, id).Error
+	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").First(&c, id).Error
 
 	if c == nil {
-		return nil, errors.New("Record with id " + id + "not fond")
+		return nil, errors.New("Record with id " + string(id) + "not fond")
 	}
 
 	if err != nil {
@@ -43,14 +42,15 @@ func (cr *carRepository) FindOne(id string) (*model.Car, error) {
 }
 
 func (cr *carRepository) Create(c *model.Car) (*model.Car, error) {
-	if err := cr.db.Create(c).Error; err != nil {
+
+	if err := cr.db.Create(&c).Error; err != nil {
 		return nil, err
 	}
 
 	return c, nil
 }
 
-func (cr *carRepository) Delete(id string) error {
+func (cr *carRepository) Delete(id int) error {
 	var c *model.Car
 	err := cr.db.Delete(&c, id).Error
 	return err
