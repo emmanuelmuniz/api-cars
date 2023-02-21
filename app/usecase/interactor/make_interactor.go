@@ -4,7 +4,7 @@ import (
 	"api-cars/app/domain/model"
 	"api-cars/app/usecase/presenter"
 	"api-cars/app/usecase/repository"
-	"errors"
+	"net/http"
 	"strconv"
 )
 
@@ -60,12 +60,8 @@ func (m *makeInteractor) Create(make *model.Make) (*model.Make, error) {
 
 	make, ok := data.(*model.Make)
 
-	if !ok {
-		return nil, err
-	}
-
-	if err != nil {
-		return nil, err
+	if !ok || err != nil {
+		return nil, model.HandleError(err, "Failed to create Make.  "+err.Error(), http.StatusNotFound)
 	}
 
 	return make, nil
@@ -73,6 +69,10 @@ func (m *makeInteractor) Create(make *model.Make) (*model.Make, error) {
 
 func (mi *makeInteractor) Delete(id string) error {
 	err := mi.ValidateRecordExists(id)
+
+	if err != nil {
+		return model.HandleError(err, "Make with ID "+id+" not found. "+err.Error(), http.StatusNotFound)
+	}
 
 	idn, errValid := strconv.Atoi(id)
 	if errValid != nil {
@@ -90,7 +90,7 @@ func (mi *makeInteractor) Update(make *model.Make) (*model.Make, error) {
 	errExists := mi.ValidateRecordExists(strconv.Itoa((make.Id)))
 
 	if errExists != nil {
-		return nil, errExists
+		return nil, model.HandleError(errExists, "Make with ID "+strconv.Itoa((make.Id))+" not found. "+errExists.Error(), http.StatusNotFound)
 	}
 
 	data, err := mi.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
@@ -100,12 +100,8 @@ func (mi *makeInteractor) Update(make *model.Make) (*model.Make, error) {
 	})
 	make, ok := data.(*model.Make)
 
-	if !ok {
-		return nil, errors.New("Update error")
-	}
-
-	if err != nil {
-		return nil, err
+	if !ok || err != nil {
+		return nil, model.HandleError(err, "Failed to update Make.  "+err.Error(), http.StatusNotFound)
 	}
 
 	return make, nil

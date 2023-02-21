@@ -29,7 +29,7 @@ func (mc *makeController) GetMakes(c Context) error {
 
 	make, err := mc.makeInteractor.Get(make)
 	if err != nil {
-		return err
+		return sendErrorCar(c, err)
 	}
 
 	return c.JSON(http.StatusOK, make)
@@ -49,12 +49,12 @@ func (mc *makeController) CreateMake(c Context) error {
 	var params model.Make
 
 	if err := c.Bind(&params); err != nil {
-		return err
+		return sendErrorCar(c, model.NewAppError("Bad Request. "+err.Error(), http.StatusBadRequest))
 	}
 
 	make, err := mc.makeInteractor.Create(&params)
 	if err != nil {
-		return err
+		return sendErrorCar(c, err)
 	}
 
 	return c.JSON(http.StatusCreated, make)
@@ -64,7 +64,7 @@ func (mc *makeController) DeleteMake(c Context, id string) error {
 	err := mc.makeInteractor.Delete(id)
 
 	if err != nil {
-		return echo.NewHTTPError(404)
+		return sendErrorCar(c, err)
 	}
 
 	return c.JSON(http.StatusNoContent, nil)
@@ -74,12 +74,12 @@ func (mc *makeController) UpdateMake(c Context) error {
 	var params model.Make
 
 	if err := c.Bind(&params); err != nil {
-		return err
+		return sendErrorCar(c, model.NewAppError("Bad Request. "+err.Error(), http.StatusBadRequest))
 	}
 
 	make, err := mc.makeInteractor.Update(&params)
 	if err != nil {
-		return echo.NewHTTPError(404)
+		return sendErrorCar(c, err)
 	}
 
 	return c.JSON(http.StatusCreated, make)

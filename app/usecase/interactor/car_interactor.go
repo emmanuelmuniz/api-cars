@@ -36,7 +36,7 @@ func (ci *carInteractor) Get(car []*model.Car) ([]*model.Car, error) {
 	car, err := ci.CarRepository.FindAll(car)
 
 	if err != nil {
-		return nil, model.HandleError(err, "Error to retrieve records", http.StatusNotFound)
+		return nil, model.HandleError(err, "Error to retrieve records. "+err.Error(), http.StatusNotFound)
 	}
 
 	return ci.CarPresenter.ResponseCars(car), nil
@@ -52,7 +52,7 @@ func (ci *carInteractor) GetOne(id string) (*model.Car, error) {
 	car, err := ci.CarRepository.FindOne(idn)
 
 	if err != nil {
-		return nil, model.HandleError(err, "Car with ID "+id+" not found", http.StatusNotFound)
+		return nil, model.HandleError(err, "Car with ID "+id+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	return ci.CarPresenter.ResponseCar(car), nil
@@ -65,7 +65,7 @@ func (c *carInteractor) Create(car *model.Car) (*model.Car, error) {
 	carModel, err = repository.CarModelRepository.FindOne(c.CarModelRepository, car.CarModel.Id)
 
 	if err != nil {
-		return nil, model.HandleError(err, "Car Model with ID "+strconv.Itoa(car.CarModel.Id)+" not found", http.StatusNotFound)
+		return nil, model.HandleError(err, "Car Model with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	car.Make = carModel.Make
@@ -80,24 +80,24 @@ func (c *carInteractor) Create(car *model.Car) (*model.Car, error) {
 
 	car, ok := data.(*model.Car)
 
-	if !ok {
-		return nil, model.HandleError(err, "Failed to create car", http.StatusBadRequest)
+	if !ok || err != nil {
+		return nil, model.HandleError(err, "Failed to create Car. "+err.Error(), http.StatusNotModified)
 	}
 
 	return car, nil
 }
 
 func (ci *carInteractor) Delete(id string) error {
-	errExists := ci.ValidateRecordExists(id)
-
-	if errExists != nil {
-		return model.HandleError(errExists, "Car with ID "+id+" not found", http.StatusNotFound)
-	}
-
 	idn, errValid := strconv.Atoi(id)
 
 	if errValid != nil {
-		return model.HandleError(errValid, "Bad Request", http.StatusBadRequest)
+		return model.HandleError(errValid, "Bad Request. "+errValid.Error(), http.StatusBadRequest)
+	}
+
+	errExists := ci.ValidateRecordExists(id)
+
+	if errExists != nil {
+		return model.HandleError(errExists, "Car with ID "+id+" not found. "+errExists.Error(), http.StatusNotFound)
 	}
 
 	return ci.CarRepository.Delete(idn)
@@ -107,7 +107,7 @@ func (ci *carInteractor) Update(car *model.Car) (*model.Car, error) {
 	errExists := ci.ValidateRecordExists(strconv.Itoa(car.Id))
 
 	if errExists != nil {
-		return nil, model.HandleError(errExists, "Car with ID "+strconv.Itoa(car.Id)+" not found", http.StatusNotFound)
+		return nil, model.HandleError(errExists, "Car with ID "+strconv.Itoa(car.Id)+" not found. "+errExists.Error(), http.StatusNotFound)
 	}
 
 	var err error
@@ -116,7 +116,7 @@ func (ci *carInteractor) Update(car *model.Car) (*model.Car, error) {
 	carModel, err = repository.CarModelRepository.FindOne(ci.CarModelRepository, car.CarModel.Id)
 
 	if err != nil {
-		return nil, model.HandleError(errExists, "Car Model with ID "+strconv.Itoa(car.CarModel.Id)+" not found", http.StatusNotFound)
+		return nil, model.HandleError(errExists, "Car Model with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	car.Make = carModel.Make
@@ -130,12 +130,8 @@ func (ci *carInteractor) Update(car *model.Car) (*model.Car, error) {
 	})
 	car, ok := data.(*model.Car)
 
-	if !ok {
-		return nil, model.HandleError(errExists, "Update error", http.StatusNotModified)
-	}
-
-	if err != nil {
-		return nil, model.HandleError(errExists, "Internal Server Error", http.StatusInternalServerError)
+	if !ok || err != nil {
+		return nil, model.HandleError(errExists, "Failed to update Car. "+err.Error(), http.StatusNotModified)
 	}
 
 	return car, nil
