@@ -13,6 +13,7 @@ func (r *registry) NewCarController() controller.CarController {
 		ip.NewCarPresenter(),
 		ir.NewMakeRepository(r.db),
 		ir.NewCarModelRepository(r.db),
+		ir.NewBodyStyleRepository(r.db),
 		ir.NewDBRepository(r.db),
 	)
 
