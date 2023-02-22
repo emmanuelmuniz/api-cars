@@ -11,28 +11,10 @@ func NewRouter(e *echo.Echo, c controller.AppController) *echo.Echo {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.GET("/cars", func(context echo.Context) error { return c.Car.GetCars(context) })
-	e.GET("/cars/:id", func(context echo.Context) error { return c.Car.GetCar(context, context.Param("id")) })
-	e.POST("/cars", func(context echo.Context) error { return c.Car.CreateCar(context) })
-	e.DELETE("/cars/:id", func(context echo.Context) error { return c.Car.DeleteCar(context, context.Param("id")) })
-	e.PUT("/cars", func(context echo.Context) error { return c.Car.UpdateCar(context) })
+	NewBodyStyleRouter(e, c)
+	NewMakeRouter(e, c)
+	NewCarModelRouter(e, c)
+	NewCarRouter(e, c)
 
-	e.GET("/makes", func(context echo.Context) error { return c.Make.GetMakes(context) })
-	e.GET("/makes/:id", func(context echo.Context) error { return c.Make.GetMake(context, context.Param("id")) })
-	e.POST("/makes", func(context echo.Context) error { return c.Make.CreateMake(context) })
-	e.DELETE("/makes/:id", func(context echo.Context) error { return c.Make.DeleteMake(context, context.Param("id")) })
-	e.PUT("/makes", func(context echo.Context) error { return c.Make.UpdateMake(context) })
-
-	e.GET("/car-models", func(context echo.Context) error { return c.CarModel.GetCarModels(context) })
-	e.GET("/car-models/:id", func(context echo.Context) error { return c.CarModel.GetCarModel(context, context.Param("id")) })
-	e.POST("/car-models", func(context echo.Context) error { return c.CarModel.CreateCarModel(context) })
-	e.DELETE("/car-models/:id", func(context echo.Context) error { return c.CarModel.DeleteCarModel(context, context.Param("id")) })
-	e.PUT("/car-models", func(context echo.Context) error { return c.CarModel.UpdateCarModel(context) })
-
-	e.GET("/body-styles", func(context echo.Context) error { return c.BodyStyle.GetBodyStyles(context) })
-	e.GET("/body-styles/:id", func(context echo.Context) error { return c.BodyStyle.GetBodyStyle(context, context.Param("id")) })
-	e.POST("/body-styles", func(context echo.Context) error { return c.BodyStyle.CreateBodyStyle(context) })
-	e.DELETE("/body-styles/:id", func(context echo.Context) error { return c.BodyStyle.DeleteBodyStyle(context, context.Param("id")) })
-	e.PUT("/body-styles", func(context echo.Context) error { return c.BodyStyle.UpdateBodyStyle(context) })
 	return e
 }
