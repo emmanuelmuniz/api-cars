@@ -4,8 +4,6 @@ import (
 	"api-cars/app/domain/model"
 	"api-cars/app/usecase/interactor"
 	"net/http"
-
-	"github.com/labstack/echo/v4"
 )
 
 type makeController struct {
@@ -39,7 +37,7 @@ func (mc *makeController) GetMake(c Context, id string) error {
 	make, err := mc.makeInteractor.GetOne(id)
 
 	if err != nil {
-		return echo.NewHTTPError(404)
+		return sendErrorCar(c, err)
 	}
 
 	return c.JSON(http.StatusCreated, make)

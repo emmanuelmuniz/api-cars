@@ -5,4 +5,5 @@ type AppController struct {
 	Make      interface{ MakeController }
 	CarModel  interface{ CarModelController }
 	BodyStyle interface{ BodyStyleController }
+	Feature   interface{ FeatureController }
 }

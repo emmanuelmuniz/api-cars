@@ -45,7 +45,7 @@ func (bsi *bodyStyleInteractor) GetOne(id string) (*model.BodyStyle, error) {
 	bodyStyle, err := bsi.BodyStyleRepository.FindOne(idn)
 
 	if err != nil {
-		return nil, err
+		return nil, model.HandleError(err, "BodyStyle with ID "+id+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	return bsi.BodyStylePresenter.ResponseBodyStyle(bodyStyle), nil

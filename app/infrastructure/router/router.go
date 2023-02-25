@@ -15,6 +15,7 @@ func NewRouter(e *echo.Echo, c controller.AppController) *echo.Echo {
 	NewMakeRouter(e, c)
 	NewCarModelRouter(e, c)
 	NewCarRouter(e, c)
+	NewFeatureRouter(e, c)
 
 	return e
 }

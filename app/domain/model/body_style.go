@@ -6,9 +6,9 @@ import (
 
 type BodyStyle struct {
 	Id          int        `json:"id"`
-	BodyStyle   string     `json:"body_style"`
+	BodyStyle   string     `json:"body_style" gorm:"not null"`
 	Description string     `json:"description"`
-	Doors       int        `json:"doors"`
+	Doors       int        `json:"doors" gorm:"not null"`
 	CreatedAt   *time.Time `json:"-"`
 	UpdatedAt   *time.Time `json:"-"`
 }

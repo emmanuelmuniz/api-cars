@@ -6,6 +6,8 @@ import (
 	"api-cars/app/usecase/repository"
 	"net/http"
 	"strconv"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type carInteractor struct {
@@ -14,6 +16,7 @@ type carInteractor struct {
 	MakeRepository      repository.MakeRepository
 	CarModelRepository  repository.CarModelRepository
 	BodyStyleRepository repository.BodyStyleRepository
+	FeatureRepository   repository.FeatureRepository
 	DBRepository        repository.DBRepository
 }
 
@@ -30,8 +33,9 @@ func NewCarInteractor(r repository.CarRepository,
 	mr repository.MakeRepository,
 	cmr repository.CarModelRepository,
 	bdr repository.BodyStyleRepository,
+	fr repository.FeatureRepository,
 	d repository.DBRepository) CarInteractor {
-	return &carInteractor{r, p, mr, cmr, bdr, d}
+	return &carInteractor{r, p, mr, cmr, bdr, fr, d}
 }
 
 func (ci *carInteractor) Get(car []*model.Car) ([]*model.Car, error) {
@@ -62,6 +66,35 @@ func (ci *carInteractor) GetOne(id string) (*model.Car, error) {
 
 func (c *carInteractor) Create(car *model.Car) (*model.Car, error) {
 	var err error
+
+	err = validateStruct(*car)
+
+	if err != nil {
+		return nil, model.HandleError(err, err.Error(), http.StatusNotFound)
+	}
+
+	var features []*model.Feature
+	var featuresIDs []int
+
+	for _, d := range car.Features {
+		featuresIDs = append(featuresIDs, d.Id)
+	}
+
+	features, err = repository.FeatureRepository.FindByIDs(c.FeatureRepository, featuresIDs)
+
+	for _, feature := range features {
+		if !containsInt(featuresIDs, feature.Id) {
+			return nil, model.HandleError(err, "Feature with ID "+strconv.Itoa(feature.Id)+" not found. "+err.Error(), http.StatusNotFound)
+		}
+
+	}
+
+	car.Features = features
+
+	if err != nil {
+		return nil, model.HandleError(err, "Car Model with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
+	}
+
 	var carModel *model.CarModel
 
 	carModel, err = repository.CarModelRepository.FindOne(c.CarModelRepository, car.CarModel.Id)
@@ -116,13 +149,34 @@ func (ci *carInteractor) Delete(id string) error {
 }
 
 func (ci *carInteractor) Update(car *model.Car) (*model.Car, error) {
+	var err error
+	var features []*model.Feature
+	var featuresIDs []int
+
+	for _, f := range car.Features {
+		featuresIDs = append(featuresIDs, f.Id)
+	}
+
+	features, err = repository.FeatureRepository.FindByIDs(ci.FeatureRepository, featuresIDs)
+
+	var idsFound []int
+
+	for _, f := range features {
+		idsFound = append(idsFound, f.Id)
+	}
+
+	idNotFund, exists := idExists(idsFound, featuresIDs)
+
+	if !exists {
+		return nil, model.HandleError(err, "Feature with ID "+strconv.Itoa(idNotFund)+" not found. ", http.StatusNotFound)
+	}
+
 	errExists := ci.ValidateRecordExists(strconv.Itoa(car.Id))
 
 	if errExists != nil {
 		return nil, model.HandleError(errExists, "Car with ID "+strconv.Itoa(car.Id)+" not found. "+errExists.Error(), http.StatusNotFound)
 	}
 
-	var err error
 	var carModel *model.CarModel
 
 	carModel, err = repository.CarModelRepository.FindOne(ci.CarModelRepository, car.CarModel.Id)
@@ -164,6 +218,36 @@ func (ci *carInteractor) ValidateRecordExists(id string) error {
 
 	if err != nil && car == nil {
 		return err
+	}
+
+	return err
+}
+
+func idExists(idsExisting []int, idsSent []int) (int, bool) {
+	for _, featureId := range idsSent {
+		if !containsInt(idsExisting, featureId) {
+			return featureId, false
+		}
+	}
+
+	return 0, true
+}
+
+func containsInt(slice []int, num int) bool {
+	for _, v := range slice {
+		if v == num {
+			return true
+		}
+	}
+	return false
+}
+
+func validateStruct(car model.Car) error {
+	validate := validator.New()
+	err := validate.Struct(car)
+
+	if err != nil {
+		return model.HandleError(err, err.Error(), http.StatusNotFound)
 	}
 
 	return err

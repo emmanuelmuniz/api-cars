@@ -4,12 +4,12 @@ import (
 	"time"
 )
 
-type Make struct {
+type Feature struct {
 	Id          int        `json:"id"`
-	Make        string     `json:"make" gorm:"not null"`
+	Feature     string     `json:"feature" gorm:"not null" validate:"required" binding:"required"`
 	Description string     `json:"description" gorm:"not null"`
 	CreatedAt   *time.Time `json:"-"`
 	UpdatedAt   *time.Time `json:"-"`
 }
 
-func (Make) TableName() string { return "makes" }
+func (Feature) TableName() string { return "features" }

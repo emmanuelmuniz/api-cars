@@ -45,7 +45,7 @@ func (mi *makeInteractor) GetOne(id string) (*model.Make, error) {
 	make, err := mi.MakeRepository.FindOne(idn)
 
 	if err != nil {
-		return nil, err
+		return nil, model.HandleError(err, "Make with ID "+id+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	return mi.MakePresenter.ResponseMake(make), nil
