@@ -14,6 +14,7 @@ func (r *registry) NewCarController() controller.CarController {
 		ir.NewMakeRepository(r.db),
 		ir.NewCarModelRepository(r.db),
 		ir.NewBodyStyleRepository(r.db),
+		ir.NewFeatureRepository(r.db),
 		ir.NewDBRepository(r.db),
 	)
 

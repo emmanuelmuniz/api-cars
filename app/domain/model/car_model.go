@@ -6,9 +6,9 @@ import (
 
 type CarModel struct {
 	Id        int        `json:"id"`
+	CarModel  string     `json:"car_model"`
 	MakeID    int        `json:"-"`
 	Make      Make       `json:"make"`
-	CarModel  string     `json:"car_model"`
 	CreatedAt *time.Time `json:"-"`
 	UpdatedAt *time.Time `json:"-"`
 }

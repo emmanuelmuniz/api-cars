@@ -16,6 +16,7 @@ type Car struct {
 	New         bool       `json:"new"`
 	BodyStyleID int        `json:"-"`
 	BodyStyle   BodyStyle  `json:"body_style"`
+	Features    []*Feature `json:"features" gorm:"many2many:car_features;"`
 	Doors       int        `json:"doors"`
 	Distance    int        `json:"distance"`
 	CreatedAt   *time.Time `json:"-"`

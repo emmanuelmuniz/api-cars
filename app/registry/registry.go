@@ -24,5 +24,6 @@ func (r *registry) NewAppController() controller.AppController {
 		Make:      r.NewMakeController(),
 		CarModel:  r.NewCarModelController(),
 		BodyStyle: r.NewBodyStyleController(),
+		Feature:   r.NewFeatureController(),
 	}
 }
