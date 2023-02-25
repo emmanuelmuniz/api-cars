@@ -6,6 +6,8 @@ import (
 	"api-cars/app/usecase/repository"
 	"net/http"
 	"strconv"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type carInteractor struct {
@@ -64,6 +66,13 @@ func (ci *carInteractor) GetOne(id string) (*model.Car, error) {
 
 func (c *carInteractor) Create(car *model.Car) (*model.Car, error) {
 	var err error
+
+	err = validateStruct(*car)
+
+	if err != nil {
+		return nil, model.HandleError(err, err.Error(), http.StatusNotFound)
+	}
+
 	var features []*model.Feature
 	var featuresIDs []int
 
@@ -231,4 +240,15 @@ func containsInt(slice []int, num int) bool {
 		}
 	}
 	return false
+}
+
+func validateStruct(car model.Car) error {
+	validate := validator.New()
+	err := validate.Struct(car)
+
+	if err != nil {
+		return model.HandleError(err, err.Error(), http.StatusNotFound)
+	}
+
+	return err
 }

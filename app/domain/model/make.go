@@ -6,8 +6,8 @@ import (
 
 type Make struct {
 	Id          int        `json:"id"`
-	Make        string     `json:"make"`
-	Description string     `json:"description"`
+	Make        string     `json:"make" gorm:"not null"`
+	Description string     `json:"description" gorm:"not null"`
 	CreatedAt   *time.Time `json:"-"`
 	UpdatedAt   *time.Time `json:"-"`
 }
