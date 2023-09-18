@@ -1,8 +1,13 @@
 package datastore
 
 import (
+	bsm "api-cars/app/cars-app/body-style/model"
+	cmm "api-cars/app/cars-app/car-model/model"
+	cm "api-cars/app/cars-app/car/model"
+	fm "api-cars/app/cars-app/feature/model"
+	mm "api-cars/app/cars-app/make/model"
+
 	"api-cars/app/config"
-	"api-cars/app/domain/model"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -25,10 +30,10 @@ func NewDB() *gorm.DB {
 		panic("Failed to connect to database")
 	}
 
-	database.AutoMigrate(&model.Car{})
-	database.AutoMigrate(&model.Make{})
-	database.AutoMigrate(&model.CarModel{})
-	database.AutoMigrate(&model.BodyStyle{})
-	database.AutoMigrate(&model.Feature{})
+	database.AutoMigrate(&cm.Car{})
+	database.AutoMigrate(&mm.Make{})
+	database.AutoMigrate(&cmm.CarModel{})
+	database.AutoMigrate(&bsm.BodyStyle{})
+	database.AutoMigrate(&fm.Feature{})
 	return database
 }

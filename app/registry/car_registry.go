@@ -1,22 +1,27 @@
 package registry
 
 import (
-	"api-cars/app/interface/controller"
-	ip "api-cars/app/interface/presenter"
-	ir "api-cars/app/interface/repository"
-	"api-cars/app/usecase/interactor"
+	dbr "api-cars/app/app-common/db"
+	bsr "api-cars/app/cars-app/body-style/repository"
+	cmr "api-cars/app/cars-app/car-model/repository"
+	"api-cars/app/cars-app/car/controller"
+	cp "api-cars/app/cars-app/car/presenter"
+	cr "api-cars/app/cars-app/car/repository"
+	cs "api-cars/app/cars-app/car/service"
+	fr "api-cars/app/cars-app/feature/repository"
+	mr "api-cars/app/cars-app/make/repository"
 )
 
 func (r *registry) NewCarController() controller.CarController {
-	carInteractor := interactor.NewCarInteractor(
-		ir.NewCarRepository(r.db),
-		ip.NewCarPresenter(),
-		ir.NewMakeRepository(r.db),
-		ir.NewCarModelRepository(r.db),
-		ir.NewBodyStyleRepository(r.db),
-		ir.NewFeatureRepository(r.db),
-		ir.NewDBRepository(r.db),
+	carService := cs.NewCarService(
+		cr.NewCarRepository(r.db),
+		cp.NewCarPresenter(),
+		mr.NewMakeRepository(r.db),
+		cmr.NewCarModelRepository(r.db),
+		bsr.NewBodyStyleRepository(r.db),
+		fr.NewFeatureRepository(r.db),
+		dbr.NewDBRepository(r.db),
 	)
 
-	return controller.NewCarController(carInteractor)
+	return controller.NewCarController(carService)
 }
