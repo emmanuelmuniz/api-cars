@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"api-cars/app/interface/controller"
+	controller "api-cars/app/app-controllers"
 
 	"gorm.io/gorm"
 )

@@ -1,18 +1,20 @@
 package registry
 
 import (
-	"api-cars/app/interface/controller"
-	ip "api-cars/app/interface/presenter"
-	ir "api-cars/app/interface/repository"
-	"api-cars/app/usecase/interactor"
+	dbr "api-cars/app/app-common/db"
+	"api-cars/app/cars-app/car-model/controller"
+	cmp "api-cars/app/cars-app/car-model/presenter"
+	cmr "api-cars/app/cars-app/car-model/repository"
+	cms "api-cars/app/cars-app/car-model/service"
+	mr "api-cars/app/cars-app/make/repository"
 )
 
 func (r *registry) NewCarModelController() controller.CarModelController {
-	carModelInteractor := interactor.NewCarModelInteractor(
-		ir.NewCarModelRepository(r.db),
-		ir.NewMakeRepository(r.db),
-		ip.NewCarModelPresenter(),
-		ir.NewDBRepository(r.db),
+	carModelInteractor := cms.NewCarModelService(
+		cmr.NewCarModelRepository(r.db),
+		mr.NewMakeRepository(r.db),
+		cmp.NewCarModelPresenter(),
+		dbr.NewDBRepository(r.db),
 	)
 
 	return controller.NewCarModelController(carModelInteractor)
