@@ -26,7 +26,7 @@ func (cr *carRepository) FindAll(c []*model.Car) ([]*model.Car, error) {
 
 func (cr *carRepository) FindOne(id int) (*model.Car, error) {
 	var c *model.Car
-	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("BodyStyle").Preload("Features").First(&c, id).Error
+	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("CarImage").Preload("BodyStyle").Preload("Features").First(&c, id).Error
 
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (cr *carRepository) Create(c *model.Car) (*model.Car, error) {
 		return nil, err
 	}
 
-	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("BodyStyle").Preload("Features").First(&c).Error
+	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("CarImage").Preload("BodyStyle").Preload("Features").First(&c).Error
 
 	if err != nil {
 		return nil, err

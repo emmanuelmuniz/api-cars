@@ -4,6 +4,7 @@ import (
 	controller "api-cars/app/app-controllers"
 
 	bsr "api-cars/app/cars-app/body-style/router"
+	cir "api-cars/app/cars-app/car-image/router"
 	cmr "api-cars/app/cars-app/car-model/router"
 	cr "api-cars/app/cars-app/car/router"
 	fr "api-cars/app/cars-app/feature/router"
@@ -22,6 +23,7 @@ func NewRouter(e *echo.Echo, c controller.AppController) *echo.Echo {
 	cmr.NewCarModelRouter(e, c)
 	cr.NewCarRouter(e, c)
 	fr.NewFeatureRouter(e, c)
+	cir.NewCarImageRouter(e, c)
 
 	return e
 }

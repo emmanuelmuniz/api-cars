@@ -2,6 +2,7 @@ package datastore
 
 import (
 	bsm "api-cars/app/cars-app/body-style/model"
+	cim "api-cars/app/cars-app/car-image/model"
 	cmm "api-cars/app/cars-app/car-model/model"
 	cm "api-cars/app/cars-app/car/model"
 	fm "api-cars/app/cars-app/feature/model"
@@ -35,5 +36,6 @@ func NewDB() *gorm.DB {
 	database.AutoMigrate(&cmm.CarModel{})
 	database.AutoMigrate(&bsm.BodyStyle{})
 	database.AutoMigrate(&fm.Feature{})
+	database.AutoMigrate(&cim.CarImage{})
 	return database
 }
