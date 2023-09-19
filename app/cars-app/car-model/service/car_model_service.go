@@ -72,13 +72,11 @@ func (m *carModelService) Create(carModel *model.CarModel) (*model.CarModel, err
 		return nil, carError.HandleError(err, err.Error(), http.StatusBadRequest)
 	}
 
-	make, err = mr.MakeRepository.FindOne(m.MakeRepository, carModel.Make.Id)
+	make, err = mr.MakeRepository.FindOne(m.MakeRepository, carModel.MakeID)
 
-	if err != nil {
-		return nil, carError.HandleError(err, "Make with ID "+strconv.Itoa(carModel.Make.Id)+" not found. "+err.Error(), http.StatusNotFound)
+	if err != nil || make == nil {
+		return nil, carError.HandleError(err, "Make with ID "+strconv.Itoa(carModel.MakeID)+" not found. "+err.Error(), http.StatusNotFound)
 	}
-
-	carModel.Make = make
 
 	data, err := m.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
 		carModel, err := m.CarModelRepository.Create(carModel)
@@ -129,13 +127,11 @@ func (cmi *carModelService) Update(carModel *model.CarModel) (*model.CarModel, e
 
 	var make *mm.Make
 
-	make, err = mr.MakeRepository.FindOne(cmi.MakeRepository, carModel.Make.Id)
+	make, err = mr.MakeRepository.FindOne(cmi.MakeRepository, carModel.MakeID)
 
-	if err != nil {
-		return nil, carError.HandleError(err, "Make with ID "+strconv.Itoa(carModel.Make.Id)+" not found. "+err.Error(), http.StatusNotFound)
+	if err != nil || make == nil {
+		return nil, carError.HandleError(err, "Make with ID "+strconv.Itoa(carModel.MakeID)+" not found. "+err.Error(), http.StatusNotFound)
 	}
-
-	carModel.Make = make
 
 	data, err := cmi.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
 		carModel, err := cmi.CarModelRepository.Update(carModel)
