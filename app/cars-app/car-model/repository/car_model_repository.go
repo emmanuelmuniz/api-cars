@@ -41,6 +41,10 @@ func (mr *carModelRepository) Create(cm *model.CarModel) (*model.CarModel, error
 		return nil, err
 	}
 
+	if err := mr.db.Preload("Make").First(cm).Error; err != nil {
+		return nil, err
+	}
+
 	return cm, nil
 }
 

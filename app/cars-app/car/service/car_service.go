@@ -14,6 +14,7 @@ import (
 	bsm "api-cars/app/cars-app/body-style/model"
 	cmm "api-cars/app/cars-app/car-model/model"
 	fm "api-cars/app/cars-app/feature/model"
+	mm "api-cars/app/cars-app/make/model"
 	carError "api-cars/app/domain/model"
 
 	"api-cars/app/app-common/validator"
@@ -104,31 +105,29 @@ func (c *carService) Create(car *model.Car) (*model.Car, error) {
 
 	car.Features = features
 
-	if err != nil {
-		return nil, carError.HandleError(err, "Car Model with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
+	var make *mm.Make
+
+	make, err = mr.MakeRepository.FindOne(c.MakeRepository, car.MakeID)
+
+	if err != nil || make == nil {
+		return nil, carError.HandleError(err, "Make with ID "+strconv.Itoa(car.MakeID)+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	var carModel *cmm.CarModel
 
-	carModel, err = cmr.CarModelRepository.FindOne(c.CarModelRepository, car.CarModel.Id)
+	carModel, err = cmr.CarModelRepository.FindOne(c.CarModelRepository, car.CarModelID)
 
-	if err != nil {
+	if err != nil || carModel == nil {
 		return nil, carError.HandleError(err, "Car Model with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
-	car.Make = carModel.Make
-	var newCarmodel = carModel
-	car.CarModel = newCarmodel
-
 	var bodyStyle *bsm.BodyStyle
 
-	bodyStyle, err = bsr.BodyStyleRepository.FindOne(c.BodyStyleRepository, car.BodyStyle.Id)
+	bodyStyle, err = bsr.BodyStyleRepository.FindOne(c.BodyStyleRepository, car.BodyStyleID)
 
-	if err != nil {
+	if err != nil || bodyStyle == nil {
 		return nil, carError.HandleError(err, "Body Style with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
 	}
-
-	car.BodyStyle = bodyStyle
 
 	data, err := c.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
 		car, err := c.CarRepository.Create(car)
@@ -190,6 +189,16 @@ func (ci *carService) Update(car *model.Car) (*model.Car, error) {
 		return nil, carError.HandleError(errExists, "Car with ID "+strconv.Itoa(car.Id)+" not found. "+errExists.Error(), http.StatusNotFound)
 	}
 
+	var make *mm.Make
+
+	make, err = mr.MakeRepository.FindOne(ci.MakeRepository, car.MakeID)
+
+	if err != nil || make == nil {
+		return nil, carError.HandleError(err, "Make with ID "+strconv.Itoa(car.MakeID)+" not found. "+err.Error(), http.StatusNotFound)
+	}
+
+	car.Make = make
+
 	var carModel *cmm.CarModel
 
 	carModel, err = cmr.CarModelRepository.FindOne(ci.CarModelRepository, car.CarModel.Id)
@@ -206,7 +215,6 @@ func (ci *carService) Update(car *model.Car) (*model.Car, error) {
 		return nil, carError.HandleError(errExists, "Body Style with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
-	car.Make = carModel.Make
 	var newCarmodel = carModel
 	car.CarModel = newCarmodel
 
