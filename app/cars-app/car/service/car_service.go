@@ -118,7 +118,7 @@ func (c *carService) Create(car *model.Car) (*model.Car, error) {
 	carModel, err = cmr.CarModelRepository.FindOne(c.CarModelRepository, car.CarModelID)
 
 	if err != nil || carModel == nil {
-		return nil, carError.HandleError(err, "Car Model with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
+		return nil, carError.HandleError(err, "Car Model with ID "+strconv.Itoa(car.CarModelID)+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	var bodyStyle *bsm.BodyStyle
@@ -126,7 +126,7 @@ func (c *carService) Create(car *model.Car) (*model.Car, error) {
 	bodyStyle, err = bsr.BodyStyleRepository.FindOne(c.BodyStyleRepository, car.BodyStyleID)
 
 	if err != nil || bodyStyle == nil {
-		return nil, carError.HandleError(err, "Body Style with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
+		return nil, carError.HandleError(err, "Body Style with ID "+strconv.Itoa(car.BodyStyleID)+" not found. "+err.Error(), http.StatusNotFound)
 	}
 
 	data, err := c.DBRepository.Transaction(func(i interface{}) (interface{}, error) {
@@ -214,7 +214,7 @@ func (ci *carService) Update(car *model.Car) (*model.Car, error) {
 	if err != nil {
 		return nil, carError.HandleError(errExists, "Body Style with ID "+strconv.Itoa(car.CarModel.Id)+" not found. "+err.Error(), http.StatusNotFound)
 	}
-
+  
 	var newCarmodel = carModel
 	car.CarModel = newCarmodel
 

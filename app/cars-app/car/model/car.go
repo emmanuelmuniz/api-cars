@@ -23,7 +23,6 @@ type Car struct {
 	BodyStyleID int           `json:"body_style_id" validate:"required"`
 	BodyStyle   *bs.BodyStyle `json:"body_style" gorm:"foreignKey:BodyStyleID"`
 	Features    []*f.Feature  `json:"features" gorm:"many2many:car_features;" validate:"required"`
-	Images      []string      `json:"images" gorm:"type:varchar[]"`
 	Distance    int           `json:"distance"`
 	CreatedAt   *time.Time    `json:"-"`
 	UpdatedAt   *time.Time    `json:"-"`
