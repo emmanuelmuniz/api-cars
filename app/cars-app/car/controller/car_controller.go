@@ -48,7 +48,7 @@ func (cc *carController) GetCar(c context.Context, id string) error {
 		return errorCar.SendErrorCar(c, err)
 	}
 
-	return c.JSON(http.StatusCreated, car)
+	return c.JSON(http.StatusOK, car)
 }
 
 func (cc *carController) CreateCar(c context.Context) error {
@@ -89,5 +89,5 @@ func (cc *carController) UpdateCar(c context.Context) error {
 		return errorCar.SendErrorCar(c, err)
 	}
 
-	return c.JSON(http.StatusCreated, car)
+	return c.JSON(http.StatusOK, car)
 }

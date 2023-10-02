@@ -15,7 +15,7 @@ func NewCarRepository(db *gorm.DB) CarRepository {
 }
 
 func (cr *carRepository) FindAll(c []*model.Car) ([]*model.Car, error) {
-	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("BodyStyle").Preload("Features").Find(&c).Error
+	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("CarImages").Preload("BodyStyle").Preload("Features").Find(&c).Error
 
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func (cr *carRepository) FindAll(c []*model.Car) ([]*model.Car, error) {
 
 func (cr *carRepository) FindOne(id int) (*model.Car, error) {
 	var c *model.Car
-	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("CarImage").Preload("BodyStyle").Preload("Features").First(&c, id).Error
+	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("CarImages").Preload("BodyStyle").Preload("Features").First(&c, id).Error
 
 	if err != nil {
 		return nil, err
@@ -41,7 +41,9 @@ func (cr *carRepository) Create(c *model.Car) (*model.Car, error) {
 		return nil, err
 	}
 
-	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("CarImage").Preload("BodyStyle").Preload("Features").First(&c).Error
+	cr.db.Save(&c)
+
+	err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("CarImages").Preload("BodyStyle").Preload("Features").First(&c).Error
 
 	if err != nil {
 		return nil, err
@@ -57,7 +59,7 @@ func (cr *carRepository) Delete(id int) error {
 }
 
 func (cr *carRepository) Update(c *model.Car) (*model.Car, error) {
-	if err := cr.db.Save(c).Error; err != nil {
+	if err := cr.db.Preload("Make").Preload("CarModel").Preload("CarModel.Make").Preload("CarImages").Preload("BodyStyle").Preload("Features").Save(c).Error; err != nil {
 		return nil, err
 	}
 
