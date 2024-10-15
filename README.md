@@ -2,14 +2,14 @@
 
 ## Description
 
-This is the API for the service of the Application Cars.
+Esta aplicación fue creada con el fin de servir como API entre la base de datos y el frontend de una aplicación de publicación de automóviles para la venta.
 
 ## Execution
 
-Commands to run the application:
+Comandos para correr la aplicación.
 
 ```go run .```
 
-or air for reload the app when a file is saved:
+o air para recargar la app cuando un archivo es guardado:
 
 ```air``` 
